@@ -128,9 +128,27 @@ const sprites = {
 ................
 ................
 ................`,
+  player2: bitmap`
+......HHH.......
+.....HHHHH......
+...000000000....
+...0..5.5..0....
+...0.00000.0....
+...0..3.3..0....
+...0..333..0....
+...000000000....
+.....00000......
+....0..0..0.....
+.......0........
+.....00000......
+....00...00.....
+................
+................
+................`,
 }
 const spriteKeys = {
   player: 'p',
+  player2:'u',
   pizza: 'v',
   wall: 'w',
   oven: 'o',
@@ -139,16 +157,16 @@ const spriteKeys = {
   dough: 'd',
 }
 
-const excludeList = ['o']
+const excludeList = ['o', 'u']
 
 setLegend(
   ...Object.entries(sprites).map(sprite => ([
     spriteKeys[sprite[0]], sprite[1]]))
 )
 
-setSolids(Object.values(spriteKeys).filter(s => s.indexOf(excludeList) === -1))
+setSolids(Object.values(spriteKeys).filter(s => excludeList.indexOf(s) === -1))
 setPushables({
-  [spriteKeys.player]: [spriteKeys.dough, spriteKeys.player]
+  [spriteKeys.player]: [spriteKeys.dough, spriteKeys.pizza, spriteKeys.player]
 })
 
 setMap(map`
@@ -156,23 +174,30 @@ wwwwwwww
 wo.....w
 w......w
 w..t...w
-w......w
-w......w
-wp.....w
+w.....ww
+w....www
+wp....uw
 wwwwwwww`)
 
 const getPlayerSprite = () => getFirst(spriteKeys.player)
 const getDoughSprite = () => getFirst(spriteKeys.dough)
 
-const ovenFire = () => {
-  const oven = getFirst(spriteKeys.oven)
-  
+const setOvenFire = (fire) => {
+  const oven = getFirst(spriteKeys.oven) ?? getFirst(spriteKeys.ovenFire)
+
   const x = oven.x
   const y = oven.y
 
   clearTile(x, y)
+  addSprite(x, y, fire === true ? spriteKeys.ovenFire : spriteKeys.oven)
+}
 
-  addSprite(x, y, spriteKeys.ovenFire)
+const ovenFire = () => {
+  setOvenFire(true)
+  setTimeout(() => {
+    setOvenFire(false)
+    addSprite(2, 2, spriteKeys.pizza)
+  }, 3 * 1000)
 }
 
 onInput("w", () => {
@@ -204,19 +229,26 @@ onInput("j", () => {
   if (getFirst(spriteKeys.dough)) {
     return;
   }
-  
+
   addSprite(5, 3, spriteKeys.dough)
 })
 
 afterInput(() => {
-  const doughSprite = getDoughSprite()
-  if (!doughSprite) {
-    return;
-  }
+  const doughSprite = getFirst(spriteKeys.dough)
+  const pizzaSprite = getFirst(spriteKeys.pizza)
 
-  const oven = getFirst(spriteKeys.oven)
+  if (pizzaSprite) {
+    const player2Sprite = getFirst(spriteKeys.player2)
+    if (pizzaSprite.x === player2Sprite.x && pizzaSprite.y === player2Sprite.y) {
+      giveMoney()
+    }
+    
+  } else if (doughSprite) {
+      const oven = getFirst(spriteKeys.oven)
 
-  if (doughSprite.x === oven.x && doughSprite.y === oven.y) {
-    ovenFire()
+      if (doughSprite.x === oven.x && doughSprite.y === oven.y) {
+        ovenFire()
+      }
+
   }
 })
