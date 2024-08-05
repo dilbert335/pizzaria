@@ -169,15 +169,39 @@ setPushables({
   [spriteKeys.player]: [spriteKeys.dough, spriteKeys.pizza, spriteKeys.player]
 })
 
-setMap(map`
+let currentLevel = -1
+const levels = [
+  map`
 wwwwwwww
 wo.....w
 w......w
 w..t...w
-w.....ww
+w......w
 w....www
 wp....uw
-wwwwwwww`)
+wwwwwwww`,
+  map`
+wwwwwwww
+wu.....w
+ww.www.w
+wo.w...w
+wwww...w
+w....w.w
+wt....pw
+wwwwwwww`
+]
+
+const nextLevel = () => {
+  currentLevel++
+  if (levels[currentLevel]) {
+    setMap(levels[currentLevel])
+  } else {
+    //todo
+    alert("you win")
+  }
+}
+
+nextLevel()
 
 const getPlayerSprite = () => getFirst(spriteKeys.player)
 const getDoughSprite = () => getFirst(spriteKeys.dough)
@@ -207,6 +231,10 @@ updateMoneyText()
 const giveMoney = () => {
   MONEY += 5
   updateMoneyText()
+
+  if (MONEY === 25) {
+    nextLevel()
+  }
 }
 
 onInput("w", () => {
@@ -270,3 +298,37 @@ afterInput(() => {
       }
   }
 })
+
+const test = tune`
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: G4-500,
+500: A4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: G4-500,
+500: A4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: G4-500,
+500: A4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: G4-500,
+500: A4-500,
+500: F4-500,
+500: F4-500,
+500: F4-500,
+500: G4-500,
+500: A4-500,
+500: F4-500,
+500: F4-500,
+500: G4-500,
+500: F4-500 + A4-500`
