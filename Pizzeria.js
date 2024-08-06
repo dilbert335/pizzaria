@@ -439,12 +439,13 @@ const initMoney = () => {
   updateMoneyText()
   giveMoney = () => {
     MONEY += 5
-    updateMoneyText()
   
     if (MONEY === PIZZAS_NEEDED * 5) {
       MONEY = 0
       nextLevel()
     }
+    updateMoneyText()
+
   }
 }
 
@@ -534,7 +535,7 @@ const bgMusic = tune`
 468.75: G4~468.75 + E4~468.75 + C4~468.75`
 let bgPlayback
 const playBgMusic = () => {
-  if (bgPlayback) {return}
+  if (bgPlayback || advancingLevel) {return}
   bgPlayback = playTune(bgMusic, Infinity)
 }
 const stopBgMusic = () => {
@@ -613,7 +614,13 @@ afterInput(() => {
     
     if (pizzaSprite.x === player2Sprite.x && pizzaSprite.y === player2Sprite.y) {
       stopBgMusic()
-      playTune(tune`
+      
+      clearTile(x, y)
+      addSprite(x, y, spriteKeys.player2)
+      giveMoney()
+
+      if (!advancingLevel) {
+              playTune(tune`
 189.873417721519: E4/189.873417721519,
 189.873417721519: D4/189.873417721519 + B5~189.873417721519,
 189.873417721519: G5/189.873417721519 + F5/189.873417721519 + E5/189.873417721519 + B5~189.873417721519,
@@ -629,11 +636,8 @@ afterInput(() => {
 189.873417721519: F4/189.873417721519,
 189.873417721519: E4/189.873417721519,
 3417.721518987342`)
-      setTimeout(playBgMusic, 9000)
-      
-      clearTile(x, y)
-      addSprite(x, y, spriteKeys.player2)
-      giveMoney()
+      setTimeout(playBgMusic, 3000)
+      }
     }
   }
 
